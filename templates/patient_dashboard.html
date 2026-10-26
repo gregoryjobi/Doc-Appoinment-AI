@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal - My Appointments</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #334155;
+        }
+        .navbar-patient {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 15px 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .brand-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .profile-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+        }
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #e2f1e7;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        .ai-triage-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 25px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            position: relative;
+        }
+        .ai-badge {
+            background: #a5c422;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .data-panel {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .data-panel-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge-status {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-scheduled { background: #dbeafe; color: #1e40af; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-noshow { background: #fef3c7; color: #92400e; }
+        .ai-chip {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar-patient clearfix">
+        <div class="pull-left brand-title">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                <i class="fa fa-heartbeat" style="color: #a5c422;"></i> Smart Health Center
+            </a>
+        </div>
+        <div class="pull-right">
+            <span class="text-muted" style="margin-right: 15px;">Logged in as <strong>{{ patient.user.username }}</strong></span>
+            <a href="{% url 'patient_edit_profile' %}" class="btn btn-sm btn-default" style="margin-right: 8px;">
+                <i class="fa fa-pencil"></i> Edit Profile
+            </a>
+            <a href="{% url 'home' %}#appointment" class="btn btn-sm" style="background: #a5c422; color: #fff; margin-right: 10px; font-weight: 600;">
+                <i class="fa fa-plus"></i> Book Consultation
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-sm btn-danger">
+                <i class="fa fa-sign-out"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 30px; padding-bottom: 50px;">
+        
+        <!-- Patient Profile Overview Card -->
+        <div class="profile-card">
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                <div class="col-sm-2 text-center">
+                    <div class="profile-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <h3 style="margin: 0 0 8px 0; font-weight: 700;">
+                        {{ patient.user.get_full_name|default:patient.user.username }}
+                    </h3>
+                    <p class="text-muted" style="margin-bottom: 4px;">
+                        <i class="fa fa-envelope-o"></i> {{ patient.user.email|default:"No email registered" }} &nbsp;|&nbsp; 
+                        <i class="fa fa-phone"></i> {{ patient.phone|default:"No phone registered" }}
+                    </p>
+                    <p class="text-muted" style="margin: 0 0 10px 0;">
+                        Age: <strong>{{ patient.age }}</strong> &nbsp;|&nbsp; 
+                        Gender: <strong>{{ patient.gender }}</strong> &nbsp;|&nbsp; 
+                        Blood Group: <strong>{{ patient.blood_group|default:"N/A" }}</strong>
+                    </p>
+                    <a href="{% url 'patient_edit_profile' %}" class="btn btn-xs btn-default">
+                        <i class="fa fa-pencil text-primary"></i> Edit Profile Details
+                    </a>
+                </div>
+                <div class="col-sm-4 text-right">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; display: inline-block; text-align: left;">
+                        <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Total Consultations</span>
+                        <h3 style="margin: 4px 0 0 0; font-weight: 800; color: #0f172a;">{{ appointments.count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI CLINICAL TRIAGE CONSOLE (LLAMA 3.2:1B) -->
+        <div class="ai-triage-card">
+            <div class="row">
+                <div class="col-md-12">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="margin: 0; font-weight: 700; color: #0f172a;">
+                            <i class="fa fa-stethoscope" style="color: #a5c422;"></i> Clinical AI Symptom Checker
+                        </h4>
+                        <span class="ai-badge"><i class="fa fa-bolt"></i> Llama 3.2 Powered</span>
+                    </div>
+                    <p class="text-muted" style="font-size: 13px; margin-bottom: 15px;">
+                        Experiencing any discomfort or symptoms? Describe what you are feeling below to receive an instant departmental triage diagnosis from our local AI engine.
+                    </p>
+                </div>
+
+                <div class="col-md-9 col-sm-8">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <textarea id="dashboard-symptoms-input" class="form-control" rows="2" placeholder="e.g. Sharp pain in the chest when inhaling deeply, accompanied by light dizziness..." style="resize: vertical; font-size: 14px; border-radius: 6px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-4">
+                    <button type="button" id="btn-triage" class="btn btn-block" onclick="runDashboardAITriage()" style="background: #a5c422; color: #ffffff; font-weight: 700; height: 54px; border-radius: 6px;">
+                        <span id="btn-triage-text"><i class="fa fa-magic"></i> Analyze Symptoms</span>
+                        <span id="btn-triage-spinner" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Analyzing...</span>
+                    </button>
+                </div>
+
+                <!-- AI Triage Result Panel -->
+                <div class="col-md-12" id="ai-dashboard-result" style="display: none; margin-top: 20px;">
+                    <div style="background: #ffffff; border: 1px solid #86efac; border-left: 6px solid #16a34a; border-radius: 8px; padding: 18px 22px;">
+                        <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                            <div class="col-sm-8">
+                                <h4 style="margin: 0 0 6px 0; font-weight: 700; color: #166534;">
+                                    <i class="fa fa-check-circle"></i> Recommended Department: <span id="dashboard-triage-dept" style="color: #1e40af;"></span>
+                                </h4>
+                                <p style="margin: 0; font-size: 13px; color: #374151;">
+                                    Based on your described condition, your symptoms have been routed to the specialist queue.
+                                </p>
+                            </div>
+                            <div class="col-sm-4 text-right">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="proceedToBookingWithAI()" style="font-weight: 600; padding: 8px 16px;">
+                                    <i class="fa fa-calendar"></i> Book In This Department &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consultations List Table with Clinic / Hospital Details -->
+        <div class="data-panel">
+            <div class="data-panel-header">
+                <div>
+                    <i class="fa fa-calendar-check-o" style="color: #a5c422;"></i> 
+                    Your Scheduled Consultations
+                </div>
+                <a href="{% url 'home' %}#appointment" class="btn btn-xs btn-primary">
+                    <i class="fa fa-plus"></i> New Booking
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="padding: 14px 20px;">Ref #</th>
+                            <th>Doctor & Specialty</th>
+                            <th>Hospital / Clinic</th>
+                            <th>Scheduled Date & Time</th>
+                            <th>Symptoms / AI Triage</th>
+                            <th>Status</th>
+                            <th style="padding-right: 20px;" class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in appointments %}
+                        <tr style="vertical-align: middle;">
+                            <td style="padding: 14px 20px; font-weight: 600; color: #64748b;">
+                                #{{ app.id }}
+                            </td>
+                            <td>
+                                <strong>Dr. {{ app.doctor.user.get_full_name|default:app.doctor.user.username }}</strong><br>
+                                <small class="text-muted">{{ app.doctor.department.name }} &bull; Fee: ${{ app.doctor.consultation_fee }}</small>
+                            </td>
+                            <td>
+                                <strong style="color: #0f172a;">
+                                    <i class="fa fa-hospital-o text-primary"></i> {{ app.doctor.clinic_name|default:"Smart Health City Hospital" }}
+                                </strong>
+                                {% if app.doctor.room_number %}
+                                    <br><small class="text-muted">Room / Cabin: {{ app.doctor.room_number }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div><i class="fa fa-calendar text-muted"></i> {{ app.appointment_date }}</div>
+                                <small class="text-muted"><i class="fa fa-clock-o text-muted"></i> {{ app.appointment_time }}</small>
+                            </td>
+                            <td style="max-width: 220px;">
+                                <div style="font-size: 13px; color: #334155; margin-bottom: 4px;">
+                                    {{ app.symptoms_text|default:"No notes entered"|truncatechars:40 }}
+                                </div>
+                                <span class="ai-chip">
+                                    <i class="fa fa-stethoscope"></i> {{ app.ai_predicted_dept|default:app.doctor.department.name }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if app.status == 'Scheduled' %}
+                                    <span class="badge-status badge-scheduled"><i class="fa fa-clock-o"></i> Scheduled</span>
+                                {% elif app.status == 'Completed' %}
+                                    <span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>
+                                {% elif app.status == 'Cancelled' %}
+                                    <span class="badge-status badge-cancelled"><i class="fa fa-ban"></i> Cancelled</span>
+                                {% else %}
+                                    <span class="badge-status badge-noshow">{{ app.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding-right: 20px;" class="text-right">
+                                {% if app.status == 'Scheduled' %}
+                                    <a href="{% url 'cancel_appointment' app.id %}" 
+                                       class="btn btn-danger btn-xs"
+                                       onclick="return confirm('Are you sure you want to cancel appointment #{{ app.id }}?');">
+                                        <i class="fa fa-times"></i> Cancel
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted"><small>None</small></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center" style="padding: 50px 20px;">
+                                <div style="color: #94a3b8; font-size: 48px; margin-bottom: 12px;">
+                                    <i class="fa fa-calendar-times-o"></i>
+                                </div>
+                                <h4 style="font-weight: 600; color: #475569; margin-bottom: 6px;">No Appointments Found</h4>
+                                <p class="text-muted" style="margin-bottom: 18px;">You do not have any scheduled appointments under your account right now.</p>
+                                <a href="{% url 'home' %}#appointment" class="btn" style="background: #a5c422; color: #fff; font-weight: 600;">
+                                    Schedule Your First Appointment
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AI TRIAGE SCRIPT FOR PATIENT DASHBOARD -->
+    <script>
+        let currentPredictedDept = "";
+        let currentSymptomText = "";
+
+        function runDashboardAITriage() {
+            const symptomInput = document.getElementById('dashboard-symptoms-input');
+            const symptoms = symptomInput ? symptomInput.value.trim() : "";
+
+            if (!symptoms) {
+                alert("Please describe your symptoms first.");
+                return;
+            }
+
+            const btnText = document.getElementById('btn-triage-text');
+            const btnSpinner = document.getElementById('btn-triage-spinner');
+            const resultBox = document.getElementById('ai-dashboard-result');
+
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline';
+
+            fetch('/api/predict-department', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ symptoms: symptoms })
+            })
+            .then(response => response.json())
+            .then(data => {
+                currentPredictedDept = data.department || "General Medicine";
+                currentSymptomText = symptoms;
+
+                document.getElementById('dashboard-triage-dept').innerText = currentPredictedDept;
+                resultBox.style.display = 'block';
+            })
+            .catch(err => {
+                console.error("Dashboard Triage Error:", err);
+                alert("Could not reach AI service. Please verify Ollama is active.");
+            })
+            .finally(() => {
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+            });
+        }
+
+        function proceedToBookingWithAI() {
+            if (!currentPredictedDept) return;
+            // Store triage context in sessionStorage to automatically pre-fill the landing page booking form
+            sessionStorage.setItem('triage_department', currentPredictedDept);
+            sessionStorage.setItem('triage_symptoms', currentSymptomText);
+            window.location.href = "{% url 'home' %}#appointment";
+        }
+    </script>
+</body>
+</html>

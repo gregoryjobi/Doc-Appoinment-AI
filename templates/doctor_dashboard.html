@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Console - Smart Health Center</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <style>
+        body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #334155; }
+        .navbar-doctor { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 15px 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .profile-card { background: #ffffff; border-radius: 10px; padding: 24px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        .data-panel { background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .data-panel-header { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Direct AI Symptom Tag Styles */
+        .symptom-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px 2px 2px 0;
+            letter-spacing: 0.2px;
+        }
+        .ai-triage-badge {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .complaint-preview {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+        .badge-status { padding: 5px 9px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+        .badge-scheduled { background: #dbeafe; color: #1e40af; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-noshow { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+
+    <header class="navbar-doctor clearfix">
+        <div class="pull-left" style="font-size: 20px; font-weight: 700;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                <i class="fa fa-heartbeat" style="color: #a5c422;"></i> Smart Health Center
+            </a>
+        </div>
+        <div class="pull-right">
+            <a href="{% url 'doctor_edit_profile' %}" class="btn btn-sm btn-default" style="margin-right: 10px;">
+                <i class="fa fa-pencil"></i> Edit Profile & Hospital
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-sm btn-danger">
+                <i class="fa fa-sign-out"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 30px; padding-bottom: 50px;">
+        
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                <div class="col-sm-8">
+                    <h3 style="margin: 0 0 6px 0; font-weight: 700;">
+                        Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}
+                    </h3>
+                    <p class="text-muted" style="margin-bottom: 4px;">
+                        <strong>{{ doctor.department.name }}</strong> &bull; {{ doctor.qualification }} &bull; {{ doctor.experience_years }} Years Exp
+                    </p>
+                    <p style="margin: 0; color: #475569;">
+                        <i class="fa fa-hospital-o text-primary"></i> <strong>Hospital:</strong> {{ doctor.clinic_name|default:"Smart Health City Hospital" }} &nbsp;|&nbsp; 
+                        Room: <strong>{{ doctor.room_number|default:"Cabin 101" }}</strong>
+                    </p>
+                </div>
+                <div class="col-sm-4 text-right">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; display: inline-block; text-align: left;">
+                        <span class="text-muted" style="font-size: 11px; text-transform: uppercase;">Active Consultations</span>
+                        <h3 style="margin: 4px 0 0 0; font-weight: 800; color: #0f172a;">{{ appointments.count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consultations Queue with Direct AI Classified Symptom Tags -->
+        <div class="data-panel">
+            <div class="data-panel-header">
+                <div>
+                    <i class="fa fa-stethoscope" style="color: #a5c422;"></i> 
+                    Patient Consultations & AI Symptom Triage
+                </div>
+                <span class="text-muted" style="font-size: 12px; font-weight: normal;">
+                    <i class="fa fa-bolt text-warning"></i> Classified Symptom Tags Ready for Rapid Clinical Review
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="padding: 14px 20px;">Ref #</th>
+                            <th>Patient</th>
+                            <th>Schedule</th>
+                            <!-- DIRECT ACCESS: CLASSIFIED SYMPTOM TAGS & CHIEF COMPLAINT -->
+                            <th style="width: 42%;">Classified Symptom Tags & Chief Complaint</th>
+                            <th>Status</th>
+                            <th style="padding-right: 20px;" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in appointments %}
+                        <tr style="vertical-align: middle;">
+                            <td style="padding: 14px 20px; font-weight: 600; color: #64748b;">
+                                #{{ app.id }}
+                            </td>
+                            <td>
+                                <strong>{{ app.patient.user.get_full_name|default:app.patient.user.username }}</strong><br>
+                                <small class="text-muted">
+                                    {{ app.patient.gender }}, {{ app.patient.age }} yrs &bull; Blood: {{ app.patient.blood_group|default:"N/A" }}
+                                </small>
+                            </td>
+                            <td>
+                                <div><i class="fa fa-calendar text-muted"></i> {{ app.appointment_date }}</div>
+                                <small class="text-muted"><i class="fa fa-clock-o text-muted"></i> {{ app.appointment_time }}</small>
+                            </td>
+
+                            <!-- CLASSIFIED SYMPTOM TAGS + EXPANDABLE COMPLAINT -->
+                            <td>
+                                <!-- AI Triage Specialty Badge -->
+                                <div style="margin-bottom: 4px;">
+                                    <span class="ai-triage-badge">
+                                        <i class="fa fa-check-circle"></i> {{ app.ai_predicted_dept|default:doctor.department.name }}
+                                    </span>
+                                </div>
+
+                                <!-- Symptom Tags -->
+                                <div style="margin-bottom: 6px;">
+                                    {% if app.get_tags_list %}
+                                        {% for tag in app.get_tags_list %}
+                                            <span class="symptom-tag"><i class="fa fa-tag text-muted"></i> {{ tag }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="symptom-tag"><i class="fa fa-tag text-muted"></i> Routine Review</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Patient Chief Complaint Text with Quick Modal Trigger -->
+                                <div class="complaint-preview" onclick="openReviewModal('{{ app.patient.user.get_full_name|default:app.patient.user.username|escapejs }}', '{{ app.ai_predicted_dept|escapejs }}', '{{ app.symptom_tags|default:"None"|escapejs }}', '{{ app.symptoms_text|escapejs }}')" title="Click to review full complaint">
+                                    <i class="fa fa-file-text-o text-muted"></i> 
+                                    <em>"{{ app.symptoms_text|default:'No patient statement entered.'|truncatechars:70 }}"</em>
+                                    <span class="text-primary" style="font-size: 11px; font-weight: bold; margin-left: 5px;">[Review]</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if app.status == 'Scheduled' %}
+                                    <span class="badge-status badge-scheduled">Scheduled</span>
+                                {% elif app.status == 'Completed' %}
+                                    <span class="badge-status badge-completed">Completed</span>
+                                {% elif app.status == 'Cancelled' %}
+                                    <span class="badge-status badge-cancelled">Cancelled</span>
+                                {% else %}
+                                    <span class="badge-status badge-noshow">{{ app.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding-right: 20px;" class="text-right">
+                                {% if app.status == 'Scheduled' %}
+                                    <div class="btn-group">
+                                        <a href="{% url 'update_appointment_status' app.id 'Completed' %}" class="btn btn-success btn-xs" title="Complete Consultation">
+                                            <i class="fa fa-check"></i>
+                                        </a>
+                                        <a href="{% url 'update_appointment_status' app.id 'No-Show' %}" class="btn btn-warning btn-xs" title="No-Show">
+                                            <i class="fa fa-user-times"></i>
+                                        </a>
+                                        <a href="{% url 'update_appointment_status' app.id 'Cancelled' %}" class="btn btn-danger btn-xs" title="Cancel">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted"><small>Resolved</small></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 50px 20px;">
+                                <div style="color: #94a3b8; font-size: 40px; margin-bottom: 10px;">
+                                    <i class="fa fa-inbox"></i>
+                                </div>
+                                <h4 style="font-weight: 600; color: #475569;">No Bookings Scheduled</h4>
+                                <p class="text-muted">You have no patient consultations in your queue.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- QUICK CLINICAL REVIEW MODAL -->
+   <!-- QUICK CLINICAL REVIEW MODAL -->
+    <div class="modal fade" id="quickReviewModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="border-radius: 10px;">
+                <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px 10px 0 0;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="font-weight: 700;">
+                        <i class="fa fa-stethoscope text-primary"></i> Patient AI Triage & Clinical Details
+                    </h4>
+                </div>
+                <div class="modal-body" style="padding: 24px;">
+                    <div class="form-group">
+                        <label class="text-muted"><small>PATIENT NAME</small></label>
+                        <h4 id="modalPatientName" style="margin-top: 0; font-weight: 700; color: #0f172a;"></h4>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted"><small>TRIAGED SPECIALTY</small></label>
+                        <div>
+                            <span id="modalPredictedDept" class="ai-triage-badge" style="font-size: 13px;"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted"><small>CLASSIFIED SYMPTOM TAGS</small></label>
+                        <div id="modalSymptomTags"></div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="text-muted"><small>FULL RECORDED COMPLAINT</small></label>
+                        <div id="modalFullComplaint" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; font-size: 14px; line-height: 1.6; color: #1e293b;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+        function openReviewModal(patientName, dept, tagsStr, fullComplaint) {
+            document.getElementById('modalPatientName').innerText = patientName;
+            document.getElementById('modalPredictedDept').innerText = dept || "General Medicine";
+            
+            const tagsContainer = document.getElementById('modalSymptomTags');
+            tagsContainer.innerHTML = '';
+            if (tagsStr && tagsStr !== 'None') {
+                const tags = tagsStr.split(',');
+                tags.forEach(t => {
+                    if (t.trim()) {
+                        const span = document.createElement('span');
+                        span.className = 'symptom-tag';
+                        span.style.fontSize = '12px';
+                        span.style.padding = '4px 8px';
+                        span.innerHTML = '<i class="fa fa-tag text-muted"></i> ' + t.trim();
+                        tagsContainer.appendChild(span);
+                    }
+                });
+            } else {
+                tagsContainer.innerHTML = '<span class="text-muted">No explicit tags extracted.</span>';
+            }
+
+            document.getElementById('modalFullComplaint').innerText = fullComplaint || "No detailed complaint provided.";
+            $('#quickReviewModal').modal('show');
+        }
+    </script>
+</body>
+</html>

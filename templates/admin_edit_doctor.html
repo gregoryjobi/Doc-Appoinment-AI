@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Doctor Affiliation - Admin Portal</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1e293b;
+            padding: 40px 0;
+        }
+        .edit-card {
+            background: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="edit-card">
+                    <div class="section-header">
+                        <h3 style="margin: 0; font-weight: 700;">
+                            <i class="fa fa-user-md text-primary"></i> Edit Doctor & Hospital Affiliation
+                        </h3>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-default">
+                            <i class="fa fa-arrow-left"></i> Back to Admin Dashboard
+                        </a>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Personal Credentials -->
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>First Name</label>
+                                <input type="text" name="first_name" class="form-control" value="{{ doctor.user.first_name }}">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Last Name</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ doctor.user.last_name }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ doctor.user.email }}" required>
+                        </div>
+
+                        <!-- Department & Qualifications -->
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Department Specialty</label>
+                                <select name="department" class="form-control" required>
+                                    {% for dept in departments %}
+                                        <option value="{{ dept.id }}" {% if dept.id == doctor.department.id %}selected{% endif %}>
+                                            {{ dept.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Medical Qualification</label>
+                                <input type="text" name="qualification" class="form-control" value="{{ doctor.qualification }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Operational Details -->
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <label>Experience (Years)</label>
+                                <input type="number" name="experience_years" class="form-control" value="{{ doctor.experience_years }}" min="0" required>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>Consultation Fee ($)</label>
+                                <input type="number" step="0.01" name="consultation_fee" class="form-control" value="{{ doctor.consultation_fee }}" required>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>Room / Cabin</label>
+                                <input type="text" name="room_number" class="form-control" value="{{ doctor.room_number|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- Hospital & Practice Location -->
+                        <div class="form-group">
+                            <label>Affiliated Hospital / Clinic Name</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-hospital-o text-primary"></i></span>
+                                <input type="text" name="clinic_name" class="form-control" value="{{ doctor.clinic_name|default:'Smart Health City Hospital' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hospital / Clinic Physical Address</label>
+                            <input type="text" name="clinic_address" class="form-control" value="{{ doctor.clinic_address|default:'' }}" placeholder="Street address or landmark">
+                        </div>
+
+                        <!-- Administrative Status -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label style="cursor: pointer;">
+                                <input type="checkbox" name="is_approved" {% if doctor.is_approved %}checked{% endif %}>
+                                <strong> Authorized / Approved for Consultations</strong>
+                            </label>
+                            <p class="text-muted" style="font-size: 12px; margin-left: 20px;">
+                                Check to make this doctor's profile visible on the main appointment scheduling portal.
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                            <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-weight: 600;">
+                                <i class="fa fa-save"></i> Save Doctor Affiliation
+                            </button>
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-default" style="padding: 10px 20px;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

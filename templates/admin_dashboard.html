@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Administration - Smart Health Center</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1e293b;
+        }
+        .navbar-admin {
+            background: #0f172a;
+            padding: 16px 30px;
+            color: #fff;
+        }
+        .navbar-admin a { color: #fff; text-decoration: none; }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-card .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .data-card {
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .data-card-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-approved { background: #dcfce7; color: #166534; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-scheduled { background: #dbeafe; color: #1e40af; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+        /* AI Risk Badges */
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .risk-high { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .risk-medium { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .risk-low { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        
+        .lead-pill {
+            font-size: 11px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Admin Header -->
+    <header class="navbar-admin clearfix">
+        <div class="pull-left">
+            <span style="font-size: 18px; font-weight: bold; letter-spacing: 0.5px;">
+                <i class="fa fa-shield text-warning"></i> Hospital Operational Management
+            </span>
+        </div>
+        <div class="pull-right">
+            <span class="text-muted" style="margin-right: 15px; color: #94a3b8;">Admin: <strong>{{ user.username }}</strong></span>
+            <a href="{% url 'home' %}" class="btn btn-xs btn-default" style="margin-right: 8px;">Main Site</a>
+            <a href="{% url 'logout' %}" class="btn btn-xs btn-danger">Logout</a>
+        </div>
+    </header>
+
+    <div class="container-fluid" style="padding: 30px;">
+
+        <!-- Analytics Overview Stats -->
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="media">
+                        <div class="media-left">
+                            <div class="icon-box" style="background: #e0f2fe; color: #0284c7;">
+                                <i class="fa fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="media-body text-right">
+                            <h3 style="margin: 0; font-weight: bold;">{{ total_patients }}</h3>
+                            <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Patients</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="media">
+                        <div class="media-left">
+                            <div class="icon-box" style="background: #fef3c7; color: #d97706;">
+                                <i class="fa fa-user-md"></i>
+                            </div>
+                        </div>
+                        <div class="media-body text-right">
+                            <h3 style="margin: 0; font-weight: bold;">{{ total_doctors }}</h3>
+                            <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Doctors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="media">
+                        <div class="media-left">
+                            <div class="icon-box" style="background: #dcfce7; color: #16a34a;">
+                                <i class="fa fa-calendar-check-o"></i>
+                            </div>
+                        </div>
+                        <div class="media-body text-right">
+                            <h3 style="margin: 0; font-weight: bold;">{{ total_appointments }}</h3>
+                            <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Total Consultations</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW AI METRIC CARD: High Risk No-Shows -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="media">
+                        <div class="media-left">
+                            <div class="icon-box" style="background: #fee2e2; color: #dc2626;">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <div class="media-body text-right">
+                            <h3 style="margin: 0; font-weight: bold; color: #dc2626;">{{ high_risk_count }}</h3>
+                            <span class="text-muted" style="font-size: 11px; text-transform: uppercase; font-weight: bold;">AI High No-Show Risk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Consultations Ledger with AI No-Show Predictor -->
+        <div class="data-card">
+            <div class="data-card-header">
+                <div>
+                    <i class="fa fa-line-chart text-primary"></i> 
+                    Consultation Ledger & AI No-Show Predictor
+                </div>
+                <span class="text-muted" style="font-weight: normal; font-size: 12px;">
+                    <i class="fa fa-bolt text-warning"></i> Assessed using Booking History, Lead Time, and Patient Reliability
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="padding: 14px 20px;">Ref #</th>
+                            <th>Patient</th>
+                            <th>Doctor & Hospital</th>
+                            <th>Schedule & Lead Time</th>
+                            <!-- AI PREDICTION COLUMN -->
+                            <th>AI No-Show Risk Score</th>
+                            <th>Key Risk Indicators</th>
+                            <th style="padding-right: 20px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in appointments %}
+                        <tr style="vertical-align: middle;">
+                            <td style="padding: 14px 20px; font-weight: bold; color: #64748b;">
+                                #{{ item.obj.id }}
+                            </td>
+                            <td>
+                                <strong>{{ item.obj.patient.user.get_full_name|default:item.obj.patient.user.username }}</strong><br>
+                                <small class="text-muted">Age: {{ item.obj.patient.age }} &bull; {{ item.obj.patient.phone|default:"No phone" }}</small>
+                            </td>
+                            <td>
+                                <strong>Dr. {{ item.obj.doctor.user.username }}</strong><br>
+                                <small class="text-muted"><i class="fa fa-hospital-o"></i> {{ item.obj.doctor.clinic_name|default:"Smart Health City Hospital" }}</small>
+                            </td>
+                            <td>
+                                <div><i class="fa fa-calendar text-muted"></i> {{ item.obj.appointment_date }}</div>
+                                <div class="lead-pill">
+                                    <i class="fa fa-hourglass-start"></i> Lead Time: <strong>{{ item.prediction.lead_days }} day(s)</strong>
+                                </div>
+                            </td>
+                            <!-- AI Risk Score & Level -->
+                            <td>
+                                {% if item.prediction.level == 'High' %}
+                                    <span class="risk-badge risk-high">
+                                        <i class="fa fa-warning"></i> High Risk ({{ item.prediction.score }}%)
+                                    </span>
+                                {% elif item.prediction.level == 'Medium' %}
+                                    <span class="risk-badge risk-medium">
+                                        <i class="fa fa-info-circle"></i> Moderate ({{ item.prediction.score }}%)
+                                    </span>
+                                {% else %}
+                                    <span class="risk-badge risk-low">
+                                        <i class="fa fa-check-circle"></i> Low Risk ({{ item.prediction.score }}%)
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <!-- Explanatory Indicators -->
+                            <td style="max-width: 260px;">
+                                <small class="text-muted" style="line-height: 1.3; display: inline-block;">
+                                    {{ item.prediction.reasons }}
+                                </small>
+                            </td>
+                            <td style="padding-right: 20px;">
+                                {% if item.obj.status == 'Scheduled' %}
+                                    <span class="badge-status badge-scheduled">Scheduled</span>
+                                {% elif item.obj.status == 'Completed' %}
+                                    <span class="badge-status badge-completed">Completed</span>
+                                {% elif item.obj.status == 'Cancelled' %}
+                                    <span class="badge-status badge-cancelled">Cancelled</span>
+                                {% else %}
+                                    <span class="badge-status" style="background: #fef3c7; color: #92400e;">{{ item.obj.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center" style="padding: 30px;">No consultations recorded.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Doctor Roster & Practice Affiliations -->
+        <div class="data-card">
+            <div class="data-card-header">
+                <div>
+                    <i class="fa fa-user-md text-primary"></i> Doctor Roster & Practice Affiliations
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="padding: 14px 20px;">Doctor</th>
+                            <th>Department</th>
+                            <th>Hospital / Clinic</th>
+                            <th>Experience & Fee</th>
+                            <th>Listing Status</th>
+                            <th style="padding-right: 20px;" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in doctors %}
+                        <tr>
+                            <td style="padding: 14px 20px;">
+                                <strong>Dr. {{ doc.user.get_full_name|default:doc.user.username }}</strong><br>
+                                <small class="text-muted">{{ doc.user.email }}</small>
+                            </td>
+                            <td>{{ doc.department.name }}</td>
+                            <td>
+                                <strong><i class="fa fa-hospital-o text-muted"></i> {{ doc.clinic_name|default:"Smart Health City Hospital" }}</strong><br>
+                                <small class="text-muted">Room: {{ doc.room_number|default:"N/A" }}</small>
+                            </td>
+                            <td>
+                                {{ doc.experience_years }} yrs &bull; ${{ doc.consultation_fee }}
+                            </td>
+                            <td>
+                                {% if doc.is_approved %}
+                                    <span class="badge-status badge-approved"><i class="fa fa-check"></i> Approved</span>
+                                {% else %}
+                                    <span class="badge-status badge-pending"><i class="fa fa-clock-o"></i> Pending Review</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding-right: 20px;" class="text-right">
+                                <a href="{% url 'admin_edit_doctor' doc.id %}" class="btn btn-xs btn-primary">
+                                    <i class="fa fa-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'toggle_doctor_approval' doc.id %}" class="btn btn-xs {% if doc.is_approved %}btn-warning{% else %}btn-success{% endif %}">
+                                    {% if doc.is_approved %}Suspend{% else %}Authorize{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 30px;">No registered doctors found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

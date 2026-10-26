@@ -1,0 +1,475 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Smart Health Center - AI Hospital & Appointment Management</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="description" content="AI Doctor Appointment & Clinic Locating System">
+    <meta name="keywords" content="hospital, clinic, appointment, doctor, AI triage">
+    <meta name="author" content="Health Center">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="{% static 'css/tooplate-style.css' %}">
+</head>
+<body id="top" data-spy="scroll" data-target=".navbar-collapse" data-offset="50">
+
+    <!-- PRE LOADER -->
+    <section class="preloader">
+        <div class="spinner">
+            <span class="spinner-rotate"></span>
+        </div>
+    </section>
+
+    <!-- HEADER / CONTACT BAR -->
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-5">
+                    <p>Welcome to Smart Health Center</p>
+                </div>
+                <div class="col-md-8 col-sm-7 text-align-right">
+                    <span class="phone-icon"><i class="fa fa-phone"></i> +1 800-234-5678</span>
+                    <span class="date-icon"><i class="fa fa-calendar-plus-o"></i> 24/7 Emergency Care</span>
+                    <span class="email-icon"><i class="fa fa-envelope-o"></i> <a href="mailto:care@smarthealth.com">care@smarthealth.com</a></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION MENU -->
+    <section class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon icon-bar"></span>
+                    <span class="icon icon-bar"></span>
+                    <span class="icon icon-bar"></span>
+                </button>
+                <a href="{% url 'home' %}" class="navbar-brand"><i class="fa fa-h-square" style="color: #a5c422;"></i> Smart Health Center</a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#top" class="smoothScroll">Home</a></li>
+                    <li><a href="#about" class="smoothScroll">About Us</a></li>
+                    <li><a href="#team" class="smoothScroll">Doctors</a></li>
+                    <li><a href="#symptom-ai" class="smoothScroll"><i class="fa fa-stethoscope"></i> AI Symptom Check</a></li>
+                    <li><a href="#appointment" class="smoothScroll">Book Appointment</a></li>
+
+                    <!-- ROLE-AWARE DYNAMIC USER & PORTALS DROPDOWN -->
+                    {% if user.is_authenticated %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #a5c422; font-weight: bold;">
+                                <i class="fa fa-user-circle"></i> {{ user.username }} <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% if user.is_superuser or user.is_staff %}
+                                    <li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-cogs"></i> Admin Dashboard</a></li>
+                                {% elif user.doctor_profile %}
+                                    <li><a href="{% url 'doctor_dashboard' %}"><i class="fa fa-user-md"></i> Doctor Station</a></li>
+                                {% else %}
+                                    <li><a href="{% url 'patient_dashboard' %}"><i class="fa fa-hospital-o"></i> My Appointments</a></li>
+                                {% endif %}
+                                <li class="divider"></li>
+                                <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out text-danger"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Portals <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'login' %}?role=patient"><i class="fa fa-user-circle"></i> Patient Portal</a></li>
+                                <li><a href="{% url 'login' %}?role=doctor"><i class="fa fa-user-md"></i> Doctor Portal</a></li>
+                                <li><a href="{% url 'login' %}?role=admin"><i class="fa fa-cogs"></i> Admin Portal</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO CAROUSEL SECTION -->
+    <section id="home" class="slider" data-stellar-background-ratio="0.5">
+        <div class="container">
+            <div class="row">
+                <div class="owl-carousel owl-theme">
+                    <div class="item item-first">
+                        <div class="caption">
+                            <div class="col-md-offset-1 col-md-10">
+                                <h3>Next-Generation Clinical Diagnostics</h3>
+                                <h1>Compassionate Care Meets AI Speed</h1>
+                                <a href="#symptom-ai" class="section-btn btn btn-default smoothScroll">Analyze Symptoms</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item item-second">
+                        <div class="caption">
+                            <div class="col-md-offset-1 col-md-10">
+                                <h3>Consult Verified Specialists</h3>
+                                <h1>Precision Healthcare Tailored For You</h1>
+                                <a href="#appointment" class="section-btn btn btn-default smoothScroll">Book a Consultation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <div class="about-info">
+                        <h2 class="wow fadeInUp" data-wow-delay="0.6s">Welcome to Your Trusted Healthcare Hub</h2>
+                        <div class="wow fadeInUp" data-wow-delay="0.8s">
+                            <p>Our integrated platform bridges clinical triage, specialist scheduling, and immediate location-aware hospital finding in real time.</p>
+                            <p>Whether you require urgent attention in Cardiology or general clinical review, our system triages your symptoms and connects you with verified specialists instantly.</p>
+                        </div>
+                        <figure class="profile wow fadeInUp" data-wow-delay="1s">
+                            <img src="{% static 'images/author-image.jpg' %}" class="img-responsive" alt="Chief Medical Officer">
+                            <figcaption>
+                                <h3>Dr. Amelia Vance</h3>
+                                <p>Chief Medical Administrator</p>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLINICAL DOCTORS DIRECTORY -->
+    <section id="team" data-stellar-background-ratio="1">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <div class="about-info">
+                        <h2 class="wow fadeInUp" data-wow-delay="0.1s">Our Clinical Specialists</h2>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                {% for doc in doctors %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="team-thumb wow fadeInUp" data-wow-delay="0.2s" style="margin-bottom: 25px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); background: #fff;">
+                        <img src="{% static 'images/team-image1.jpg' %}" class="img-responsive" alt="Doctor profile">
+                        <div class="team-info" style="padding: 20px;">
+                            <h3 style="margin-top: 0;">Dr. {{ doc.user.get_full_name|default:doc.user.username }}</h3>
+                            <p class="text-primary" style="font-weight: bold; margin-bottom: 5px;">{{ doc.department.name }}</p>
+                            <p class="text-muted" style="font-size: 13px; margin-bottom: 5px;">{{ doc.qualification }} &bull; {{ doc.experience_years }} yrs exp</p>
+                            <p style="font-size: 13px;">Fee: <strong>${{ doc.consultation_fee }}</strong> | Room: {{ doc.room_number|default:"Cabin 101" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-md-12 text-center" style="padding: 30px;">
+                    <p class="text-muted">Doctors currently updating rosters. Please proceed to the booking console.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- AI SYMPTOM TRIAGE SECTION -->
+    <section id="symptom-ai" style="padding: 60px 0; background: #ffffff;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <div class="section-title">
+                        <h2><i class="fa fa-stethoscope" style="color: #a5c422;"></i> AI Symptom Analysis & Triage</h2>
+                        <p>Describe your discomfort, pains, or chief complaints. Our AI model triages your symptoms, selects the appropriate medical department, pre-fills the consultation form, and matches you with top-rated specialists.</p>
+                    </div>
+                    <form onsubmit="predictDepartment(event)">
+                        <div class="form-group">
+                            <textarea id="symptoms" class="form-control" rows="4" placeholder="e.g., severe chest tightness, shortness of breath, dizziness upon exertion..." required style="border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg" style="background: #a5c422; border: none; font-weight: bold;">
+                            <i class="fa fa-magic"></i> Analyze Symptoms
+                        </button>
+                    </form>
+
+                    <!-- Prediction Result Card -->
+                    <div id="ai-prediction-card" class="alert alert-info text-left" style="display: none; margin-top: 25px; border-radius: 8px; border-left: 5px solid #a5c422; background: #f4fbf4; color: #2e5934;">
+                        <h4 style="margin-top: 0; font-weight: bold;"><i class="fa fa-check-circle"></i> Recommended Department: <span id="predicted-department" style="color: #1e3a8a;"></span></h4>
+                        <p style="margin-bottom: 0;">We have selected this department, assigned the most experienced doctor, and configured the map locator below for your area.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEARBY CLINICS GOOGLE MAPS SECTION -->
+    <section id="hospital-map-section" style="padding: 60px 0; background: #f8fafc;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="section-title">
+                        <h2><i class="fa fa-map-marker" style="color: #a5c422;"></i> Closest Specialized Clinics & Hospitals</h2>
+                        <p id="map-status-text">Locate nearby hospitals and specialized centers automatically based on your department or preferred area.</p>
+                    </div>
+                </div>
+
+                <!-- Controls Bar -->
+                <div class="col-md-12 col-sm-12" style="margin-bottom: 20px;">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label for="map-dept-input" class="text-muted"><small>Medical Specialty / Department:</small></label>
+                                <input type="text" id="map-dept-input" class="form-control" placeholder="e.g. Cardiology, Dermatology" oninput="syncLocationWithMap()">
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            <div class="form-group">
+                                <label for="map-location-input" class="text-muted"><small>Area / City / Neighborhood:</small></label>
+                                <div class="input-group">
+                                    <input type="text" id="map-location-input" class="form-control" placeholder="e.g. Ernakulam, Kakkanad, MG Road" oninput="syncLocationWithMap()">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" onclick="detectCurrentLocation()" title="Use GPS Location">
+                                            <i class="fa fa-crosshairs text-primary"></i> GPS
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="invisible"><small>Action</small></label>
+                                <button type="button" class="btn btn-primary btn-block" onclick="syncLocationWithMap()" style="border-radius: 4px;">
+                                    <i class="fa fa-search"></i> Search Map
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Maps Embed Container -->
+                <div class="col-md-12 col-sm-12">
+                    <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid #e2e8f0; height: 450px; background: #eaeaea;">
+                        <iframe 
+                            id="google-maps-frame"
+                            width="100%" 
+                            height="450" 
+                            frameborder="0" 
+                            scrolling="no" 
+                            marginheight="0" 
+                            marginwidth="0" 
+                            src="https://maps.google.com/maps?q=hospital+near+me&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- APPOINTMENT BOOKING CONSOLE -->
+    <section id="appointment" data-stellar-background-ratio="3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <img src="{% static 'images/appointment-image.jpg' %}" class="img-responsive" alt="Clinical Booking">
+                </div>
+
+                <div class="col-md-6 col-sm-6">
+                    <!-- ENFORCED CSRF POST FORM -->
+                    <form id="appointment-form" role="form" method="post" action="{% url 'book_appointment' %}">
+                        {% csrf_token %}
+
+                        <div class="section-title wow fadeInUp" data-wow-delay="0.2s">
+                            <h2>Schedule a Consultation</h2>
+                        </div>
+
+                        <div class="wow fadeInUp" data-wow-delay="0.4s">
+                            <div class="row">
+                                <!-- Patient Full Name -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="name">Full Name</label>
+                                        <input type="text" class="form-control" id="name" name="patient_name" value="{{ user.get_full_name|default:user.username }}" placeholder="Full Name" required>
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="patient_email" value="{{ user.email }}" placeholder="Your Email" required>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="patient_phone" placeholder="Phone Number" required>
+                                    </div>
+                                </div>
+
+                                <!-- Department Selector -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="department-select">Select Department</label>
+                                        <select class="form-control" name="department" id="department-select" onchange="onDepartmentChange()" required>
+                                            <option value="">Select Department</option>
+                                            {% for dept in departments %}
+                                                <option value="{{ dept.name }}">{{ dept.name }}</option>
+                                            {% empty %}
+                                                <option value="General Medicine">General Medicine</option>
+                                                <option value="Cardiology">Cardiology</option>
+                                                <option value="Dermatology">Dermatology</option>
+                                                <option value="Orthopedics">Orthopedics</option>
+                                                <option value="Pediatrics">Pediatrics</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                               <!-- Doctor Selection -->
+<div class="col-md-6 col-sm-6">
+    <div class="form-group">
+        <label for="doctor-select">Select Available Doctor</label>
+        <select class="form-control" name="doctor_id" id="doctor-select" onchange="onDoctorChange()" required>
+            <option value="">-- Choose Department First --</option>
+        </select>
+    </div>
+</div>
+
+<!-- Hospital / Clinic Display Field -->
+<div class="col-md-6 col-sm-6">
+    <div class="form-group">
+        <label for="hospital_name_display">Doctor's Hospital / Clinic</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-hospital-o text-primary"></i></span>
+            <input type="text" id="hospital_name_display" class="form-control" placeholder="Select a doctor to view hospital" readonly style="background-color: #f8fafc; font-weight: 600; color: #1e293b;">
+        </div>
+    </div>
+</div>
+
+                                <!-- Location with Auto GPS Detect -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="patient_location">Your Area / City / Landmark</label>
+                                        <div class="input-group">
+                                            <input type="text" name="patient_location" id="patient_location" class="form-control" placeholder="e.g. Ernakulam, Kakkanad..." oninput="syncLocationWithMap()" required>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" onclick="detectCurrentLocation()" title="Detect GPS Location">
+                                                    <i class="fa fa-crosshairs text-primary"></i> Detect
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Appointment Date -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="date">Select Date</label>
+                                        <input type="date" name="appointment_date" id="date" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <!-- Appointment Time -->
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="time">Select Time</label>
+                                        <input type="time" name="appointment_time" id="time" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden AI Predicted Dept for Form Binding -->
+                                <input type="hidden" name="ai_predicted_dept" id="ai-dept-hidden">
+
+                                <!-- Symptoms / Chief Complaint Textarea -->
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="booking_symptoms">Describe Symptoms / Chief Complaint</label>
+                                        <textarea class="form-control" rows="4" id="booking_symptoms" name="symptoms_text" placeholder="Detail any conditions, symptoms or visit reasons..."></textarea>
+                                    </div>
+                                    <button type="submit" class="form-control" id="cf-submit" name="submit" style="background:#a5c422; color:#fff; font-weight:bold; border:none; margin-top: 10px;">
+                                        Confirm Appointment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer data-stellar-background-ratio="5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-4">
+                    <div class="footer-thumb">
+                        <h4 class="wow fadeInUp" data-wow-delay="0.4s">Contact Information</h4>
+                        <p>Smart Health Center Clinical Network</p>
+                        <div class="contact-info">
+                            <p><i class="fa fa-phone"></i> +1 800-234-5678</p>
+                            <p><i class="fa fa-envelope-o"></i> <a href="mailto:info@smarthealth.com">info@smarthealth.com</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <div class="footer-thumb">
+                        <h4 class="wow fadeInUp" data-wow-delay="0.4s">Clinical Hours</h4>
+                        <div class="latest-stories">
+                            <div class="stories-info">
+                                <p>Monday - Friday: 06:00 AM - 10:00 PM</p>
+                                <p>Saturday - Sunday: 08:00 AM - 08:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <div class="footer-thumb">
+                        <div class="opening-hours">
+                            <h4 class="wow fadeInUp" data-wow-delay="0.4s">Emergency Desk</h4>
+                            <p>Our trauma and emergency center operates round-the-clock 24/7/365.</p>
+                        </div>
+                        <ul class="social-icon">
+                            <li><a href="#" class="fa fa-facebook-square"></a></li>
+                            <li><a href="#" class="fa fa-twitter"></a></li>
+                            <li><a href="#" class="fa fa-instagram"></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 border-top">
+                    <div class="col-md-8 col-sm-8">
+                        <div class="copyright-text">
+                            <p>Copyright &copy; Smart Health Center | Designed with Tooplate Bootstrap</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4 text-align-right">
+                        <div class="angle-up-btn">
+                            <a href="#top" class="smoothScroll wow fadeInUp" data-wow-delay="1.2s"><i class="fa fa-angle-up"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.sticky.js' %}"></script>
+    <script src="{% static 'js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'js/wow.min.js' %}"></script>
+    <script src="{% static 'js/smoothscroll.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <!-- CUSTOM APP SCRIPTS -->
+    <script src="{% static 'js/custom.js' %}"></script>
+</body>
+</html>

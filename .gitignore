@@ -1,0 +1,23 @@
+# Python virtual environments
+env/
+venv/
+ENV/
+.env
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+db.sqlite3
+*.sqlite3
+
+# Static files collected & media
+/media/
+/staticfiles/
+
+# IDE / Editor configs
+.vscode/
+.idea/
+*.swp
